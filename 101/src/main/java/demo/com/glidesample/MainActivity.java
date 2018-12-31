@@ -15,7 +15,8 @@ public class MainActivity extends AppCompatActivity {
 
         ImageView iv_hello = findViewById(R.id.iv_hello);
         Glide.with(this)
-                .load("https://m.media-amazon.com/images/M/MV5BODcwOTg2MDE3NF5BMl5BanBnXkFtZTgwNTUyNTY1NjM@._V1_UY1200_CR90,0,630,1200_AL_.jpg")
+                .load(
+                        "https://m.media-amazon.com/images/M/MV5BODcwOTg2MDE3NF5BMl5BanBnXkFtZTgwNTUyNTY1NjM@._V1_UY1200_CR90,0,630,1200_AL_.jpg")
                 .into(iv_hello);
     }
 }

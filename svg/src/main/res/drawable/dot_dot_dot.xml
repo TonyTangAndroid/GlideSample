@@ -7,8 +7,8 @@
         <shape android:shape="oval">
             <size
                 android:width="10dp"
-                android:height="10dp"/>
-            <solid android:color="@android:color/black"/>
+                android:height="10dp" />
+            <solid android:color="@android:color/black" />
         </shape>
     </item>
     <item
@@ -17,8 +17,8 @@
         <shape android:shape="oval">
             <size
                 android:width="10dp"
-                android:height="10dp"/>
-            <solid android:color="@android:color/black"/>
+                android:height="10dp" />
+            <solid android:color="@android:color/black" />
         </shape>
     </item>
     <item
@@ -27,8 +27,8 @@
         <shape android:shape="oval">
             <size
                 android:width="10dp"
-                android:height="10dp"/>
-            <solid android:color="@android:color/black"/>
+                android:height="10dp" />
+            <solid android:color="@android:color/black" />
         </shape>
     </item>
 </layer-list>
