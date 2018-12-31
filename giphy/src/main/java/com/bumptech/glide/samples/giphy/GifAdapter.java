@@ -15,6 +15,8 @@ import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import java.util.Collections;
 import java.util.List;
 
+import hugo.weaving.DebugLog;
+
 class GifAdapter extends RecyclerView.Adapter<GifViewHolder>
         implements ListPreloader.PreloadModelProvider<Api.GifResult> {
 
@@ -25,11 +27,18 @@ class GifAdapter extends RecyclerView.Adapter<GifViewHolder>
     private final ViewPreloadSizeProvider<Api.GifResult> preloadSizeProvider;
 
     private Api.GifResult[] results = EMPTY_RESULTS;
+    private final GlideRequests glideRequests;
 
-    GifAdapter(Activity activity, RequestBuilder<Drawable> requestBuilder,
+    public ListPreloader.PreloadSizeProvider<Api.GifResult> getPreloadSizeProvider() {
+        return preloadSizeProvider;
+    }
+
+    GifAdapter(Activity activity,
+               GlideRequests glideRequests,
                ViewPreloadSizeProvider<Api.GifResult> preloadSizeProvider) {
         this.activity = activity;
-        this.requestBuilder = requestBuilder;
+        this.glideRequests = glideRequests;
+        this.requestBuilder = glideRequests.asDrawable();
         this.preloadSizeProvider = preloadSizeProvider;
     }
 
@@ -54,6 +63,22 @@ class GifAdapter extends RecyclerView.Adapter<GifViewHolder>
         holder.bind(results[position]);
     }
 
+    @DebugLog
+    @Override
+    public void onViewRecycled(@NonNull GifViewHolder holder) {
+        super.onViewRecycled(holder);
+        glideRequests.clear(holder.gifView);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull GifViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull GifViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+    }
 
     @Override
     public long getItemId(int i) {

@@ -38,6 +38,7 @@ class GifViewHolder extends RecyclerView.ViewHolder {
         this.preloadSizeProvider.setView(this.gifView);
     }
 
+
     private void onClick(Api.GifResult result) {
         ClipboardManager clipboard =
                 (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);

@@ -1,14 +1,12 @@
 package com.bumptech.glide.samples.giphy;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
 
@@ -28,29 +26,21 @@ public class MainActivity extends Activity implements Api.Monitor {
         initLogo();
         glideRequests = GlideApp.with(this);
         RecyclerView gifList = initRecyclerView();
-        addPreloader(gifList);
-    }
-
-    private void addPreloader(RecyclerView recyclerView) {
-        RecyclerViewPreloader<Api.GifResult> preloader = constructPreloader(recyclerView);
-        recyclerView.addOnScrollListener(preloader);
-        recyclerView.setRecyclerListener(this::onViewHolderRecycled);
-    }
-
-    private void onViewHolderRecycled(RecyclerView.ViewHolder holder) {
-        // This is an optimization to reduce the memory usage of RecyclerView's recycled view pool
-        // and good practice when using Glide with RecyclerView.
-        GifViewHolder gifViewHolder = (GifViewHolder) holder;
-        glideRequests.clear(gifViewHolder.gifView);
+        adapter = constructAdapter();
+        gifList.setAdapter(adapter);
+        gifList.addOnScrollListener(constructPreloader());
     }
 
     @NonNull
-    private RecyclerViewPreloader<Api.GifResult> constructPreloader(RecyclerView gifList) {
-        RequestBuilder<Drawable> gifItemRequest = glideRequests.asDrawable();
+    private GifAdapter constructAdapter() {
         ViewPreloadSizeProvider<Api.GifResult> provider = new ViewPreloadSizeProvider<>();
-        adapter = new GifAdapter(this, gifItemRequest, provider);
-        gifList.setAdapter(adapter);
-        return new RecyclerViewPreloader<>(glideRequests, adapter, provider, 4);
+        return new GifAdapter(this, glideRequests, provider);
+    }
+
+
+    @NonNull
+    private RecyclerViewPreloader<Api.GifResult> constructPreloader() {
+        return new RecyclerViewPreloader<>(glideRequests, adapter, adapter.getPreloadSizeProvider(), 4);
     }
 
     @NonNull
