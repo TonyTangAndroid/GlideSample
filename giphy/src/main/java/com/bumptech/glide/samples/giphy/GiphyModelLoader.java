@@ -6,10 +6,7 @@ import android.text.TextUtils;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.ModelLoader;
-import com.bumptech.glide.load.model.ModelLoaderFactory;
-import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.bumptech.glide.load.model.stream.BaseGlideUrlLoader;
-import com.bumptech.glide.samples.giphy.Api.GifResult;
 
 import java.io.InputStream;
 
@@ -20,7 +17,7 @@ import java.io.InputStream;
  */
 public final class GiphyModelLoader extends BaseGlideUrlLoader<Api.GifResult> {
 
-    private GiphyModelLoader(ModelLoader<GlideUrl, InputStream> urlLoader) {
+    GiphyModelLoader(ModelLoader<GlideUrl, InputStream> urlLoader) {
         super(urlLoader);
     }
 
@@ -50,20 +47,4 @@ public final class GiphyModelLoader extends BaseGlideUrlLoader<Api.GifResult> {
         }
     }
 
-    /**
-     * The default factory for {@link com.bumptech.glide.samples.giphy.GiphyModelLoader}s.
-     */
-    public static final class Factory implements ModelLoaderFactory<GifResult, InputStream> {
-
-        @NonNull
-        @Override
-        public ModelLoader<Api.GifResult, InputStream> build(MultiModelLoaderFactory multiFactory) {
-            return new GiphyModelLoader(multiFactory.build(GlideUrl.class, InputStream.class));
-        }
-
-        @Override
-        public void teardown() {
-            // Do nothing.
-        }
-    }
 }

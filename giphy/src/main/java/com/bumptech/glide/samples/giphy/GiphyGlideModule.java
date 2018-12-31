@@ -19,7 +19,7 @@ public class GiphyGlideModule extends AppGlideModule {
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide,
                                    @NonNull Registry registry) {
-        registry.append(Api.GifResult.class, InputStream.class, new GiphyModelLoader.Factory());
+        registry.append(Api.GifResult.class, InputStream.class, new GiphyModeFactory());
     }
 
     // Disable manifest parsing to avoid adding similar modules twice.
