@@ -16,11 +16,13 @@ import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
 import com.bumptech.glide.ListPreloader;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
 import com.bumptech.glide.util.Preconditions;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -43,18 +45,14 @@ public class MainActivity extends Activity implements Api.Monitor {
         .into(giphyLogoView);
 
     RecyclerView gifList = findViewById(R.id.gif_list);
-    LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-    gifList.setLayoutManager(layoutManager);
-
     RequestBuilder<Drawable> gifItemRequest = GlideApp.with(this)
         .asDrawable();
 
     ViewPreloadSizeProvider<Api.GifResult> preloadSizeProvider =
         new ViewPreloadSizeProvider<>();
     adapter = new GifAdapter(this, gifItemRequest, preloadSizeProvider);
-    gifList.setAdapter(adapter);
     RecyclerViewPreloader<Api.GifResult> preloader =
-        new RecyclerViewPreloader<>(GlideApp.with(this), adapter, preloadSizeProvider, 9);
+        new RecyclerViewPreloader<>(GlideApp.with(this), adapter, preloadSizeProvider, 10);
     gifList.addOnScrollListener(preloader);
     gifList.setRecyclerListener(new RecyclerListener() {
       @Override
@@ -65,6 +63,10 @@ public class MainActivity extends Activity implements Api.Monitor {
         GlideApp.with(MainActivity.this).clear(gifViewHolder.gifView);
       }
     });
+
+    LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+    gifList.setLayoutManager(layoutManager);
+    gifList.setAdapter(adapter);
   }
 
   @Override
