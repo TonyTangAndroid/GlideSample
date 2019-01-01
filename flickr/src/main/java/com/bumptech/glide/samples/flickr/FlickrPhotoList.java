@@ -27,13 +27,14 @@ import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import java.util.Collections;
 import java.util.List;
 
+import hugo.weaving.DebugLog;
+
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 /**
  * A fragment that shows cropped image thumbnails half the width of the screen in a scrolling list.
  */
 public class FlickrPhotoList extends Fragment implements PhotoViewer {
-
     private static final int PRELOAD_AHEAD_ITEMS = 5;
     private static final String STATE_POSITION_INDEX = "state_position_index";
     private static final String STATE_POSITION_OFFSET = "state_position_offset";
@@ -121,7 +122,6 @@ public class FlickrPhotoList extends Fragment implements PhotoViewer {
     }
 
     private static final class PhotoTitleViewHolder extends RecyclerView.ViewHolder {
-
         private final TextView titleView;
         private final ImageView imageView;
 
@@ -134,7 +134,6 @@ public class FlickrPhotoList extends Fragment implements PhotoViewer {
 
     private final class FlickrPhotoListAdapter extends RecyclerView.Adapter<PhotoTitleViewHolder>
             implements ListPreloader.PreloadModelProvider<Photo> {
-
         private final LayoutInflater inflater;
         private List<Photo> photos = Collections.emptyList();
 
@@ -147,6 +146,7 @@ public class FlickrPhotoList extends Fragment implements PhotoViewer {
             notifyDataSetChanged();
         }
 
+        @NonNull
         @Override
         public PhotoTitleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = inflater.inflate(R.layout.flickr_photo_list_item, parent, false);
@@ -155,6 +155,7 @@ public class FlickrPhotoList extends Fragment implements PhotoViewer {
             return vh;
         }
 
+        @DebugLog
         @Override
         public void onBindViewHolder(PhotoTitleViewHolder holder, int position) {
             final Photo current = photos.get(position);
@@ -183,6 +184,7 @@ public class FlickrPhotoList extends Fragment implements PhotoViewer {
             return photos.size();
         }
 
+        @DebugLog
         @NonNull
         @Override
         public List<Photo> getPreloadItems(int position) {

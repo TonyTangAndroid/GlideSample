@@ -11,7 +11,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.util.LruCache;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,17 +42,10 @@ public final class Api {
             put(1024, "b");
         }
     };
-    private static final List<Integer> SORTED_SIZE_KEYS =
-            new ArrayList<>(EDGE_TO_SIZE_KEY.size());
+    private static final List<Integer> SORTED_SIZE_KEYS = Arrays.asList(75, 100, 150, 240, 320, 640, 1024);
     public static final int SQUARE_THUMB_SIZE = SORTED_SIZE_KEYS.get(0);
     private static Api api;
 
-    static {
-        for (int i = 0; i < EDGE_TO_SIZE_KEY.size(); i++) {
-            SORTED_SIZE_KEYS.add(EDGE_TO_SIZE_KEY.keyAt(i));
-        }
-        Collections.sort(SORTED_SIZE_KEYS);
-    }
 
     private final RequestQueue requestQueue;
     private final Set<QueryListener> queryListeners = new HashSet<>();

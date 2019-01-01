@@ -44,7 +44,6 @@ import java.util.concurrent.ExecutionException;
  */
 public class FlickrSearchActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
-
     private static final String TAG = "FlickrSearchActivity";
     private static final String STATE_QUERY = "state_search_string";
     private static final Query DEFAULT_QUERY = new SearchQuery("kitten");
@@ -52,8 +51,6 @@ public class FlickrSearchActivity extends AppCompatActivity
 
     static {
         Map<Page, Integer> temp = new HashMap<>();
-        temp.put(Page.SMALL, R.string.small);
-        temp.put(Page.MEDIUM, R.string.medium);
         temp.put(Page.LIST, R.string.list);
         PAGE_TO_TITLE = Collections.unmodifiableMap(temp);
     }
@@ -201,13 +198,10 @@ public class FlickrSearchActivity extends AppCompatActivity
     }
 
     private enum Page {
-        SMALL,
-        MEDIUM,
         LIST
     }
 
     private static class BackgroundThumbnailFetcher implements Runnable {
-
         private final Context context;
         private final List<Photo> photos;
 
@@ -252,7 +246,6 @@ public class FlickrSearchActivity extends AppCompatActivity
     }
 
     private class QueryListener implements Api.QueryListener {
-
         @Override
         public void onSearchCompleted(Query query, List<Photo> photos) {
             if (!isCurrentQuery(query)) {
@@ -330,7 +323,7 @@ public class FlickrSearchActivity extends AppCompatActivity
 
         @Override
         public int getCount() {
-            return Page.values().length;
+            return PAGE_TO_TITLE.size();
         }
 
         @Override
@@ -342,13 +335,7 @@ public class FlickrSearchActivity extends AppCompatActivity
 
         private Fragment pageToFragment(int position) {
             Page page = Page.values()[position];
-            if (page == Page.SMALL) {
-                int pageSize = getPageSize(R.dimen.small_photo_side);
-                return FlickrPhotoGrid.newInstance(pageSize, 15, false /*thumbnail*/);
-            } else if (page == Page.MEDIUM) {
-                int pageSize = getPageSize(R.dimen.medium_photo_side);
-                return FlickrPhotoGrid.newInstance(pageSize, 10, true /*thumbnail*/);
-            } else if (page == Page.LIST) {
+            if (page == Page.LIST) {
                 return FlickrPhotoList.newInstance();
             } else {
                 throw new IllegalArgumentException("No fragment class for page=" + page);
