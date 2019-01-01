@@ -1,12 +1,10 @@
 package com.bumptech.glide.samples.flickr;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Process;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -22,13 +20,11 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.prefill.PreFillType;
-import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.samples.flickr.api.Api;
 import com.bumptech.glide.samples.flickr.api.Photo;
 import com.bumptech.glide.samples.flickr.api.Query;
 import com.bumptech.glide.samples.flickr.api.SearchQuery;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 /**
  * An activity that allows users to search for images on Flickr and that contains a series of
@@ -61,9 +56,6 @@ public class FlickrSearchActivity extends AppCompatActivity
     private View searching;
     private TextView searchTerm;
     private View searchLoading;
-    private BackgroundThumbnailFetcher backgroundThumbnailFetcher;
-    private HandlerThread backgroundThread;
-    private Handler backgroundHandler;
     private SearchView searchView;
     private Query currentQuery;
 
@@ -73,6 +65,7 @@ public class FlickrSearchActivity extends AppCompatActivity
         if (fragment instanceof PhotoViewer) {
             PhotoViewer photoViewer = (PhotoViewer) fragment;
             photoViewer.onPhotosUpdated(currentPhotos);
+            //noinspection RedundantCollectionOperation
             if (!photoViewers.contains(photoViewer)) {
                 photoViewers.add(photoViewer);
             }
@@ -115,17 +108,13 @@ public class FlickrSearchActivity extends AppCompatActivity
                 .penaltyLog()
                 .build());
 
-        backgroundThread = new HandlerThread("BackgroundThumbnailHandlerThread");
-        backgroundThread.start();
-        backgroundHandler = new Handler(backgroundThread.getLooper());
-
         setContentView(R.layout.flickr_search_activity);
         searching = findViewById(R.id.searching);
         searchLoading = findViewById(R.id.search_loading);
-        searchTerm = (TextView) findViewById(R.id.search_term);
+        searchTerm = findViewById(R.id.search_term);
 
         Resources res = getResources();
-        ViewPager pager = (ViewPager) findViewById(R.id.view_pager);
+        ViewPager pager = findViewById(R.id.view_pager);
         pager.setPageMargin(res.getDimensionPixelOffset(R.dimen.page_margin));
         pager.setAdapter(new FlickrPagerAdapter(getSupportFragmentManager()));
 
@@ -170,12 +159,6 @@ public class FlickrSearchActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         Api.get(this).unregisterSearchListener(queryListener);
-        if (backgroundThumbnailFetcher != null) {
-            backgroundThumbnailFetcher.cancel();
-            backgroundThumbnailFetcher = null;
-            backgroundThread.quit();
-            backgroundThread = null;
-        }
     }
 
     private void executeSearch(String searchString) {
@@ -201,51 +184,8 @@ public class FlickrSearchActivity extends AppCompatActivity
         LIST
     }
 
-    private static class BackgroundThumbnailFetcher implements Runnable {
-        private final Context context;
-        private final List<Photo> photos;
-
-        private boolean isCancelled;
-
-        BackgroundThumbnailFetcher(Context context, List<Photo> photos) {
-            this.context = context;
-            this.photos = photos;
-        }
-
-        void cancel() {
-            isCancelled = true;
-        }
-
-        @Override
-        public void run() {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST);
-            for (Photo photo : photos) {
-                if (isCancelled) {
-                    return;
-                }
-
-                FutureTarget<File> futureTarget = GlideApp.with(context)
-                        .downloadOnly()
-                        .load(photo)
-                        .submit(Api.SQUARE_THUMB_SIZE, Api.SQUARE_THUMB_SIZE);
-
-                try {
-                    futureTarget.get();
-                } catch (InterruptedException e) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        Log.d(TAG, "Interrupted waiting for background downloadOnly", e);
-                    }
-                } catch (ExecutionException e) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        Log.d(TAG, "Got ExecutionException waiting for background downloadOnly", e);
-                    }
-                }
-                GlideApp.with(context).clear(futureTarget);
-            }
-        }
-    }
-
     private class QueryListener implements Api.QueryListener {
+        @SuppressLint("LogNotTimber")
         @Override
         public void onSearchCompleted(Query query, List<Photo> photos) {
             if (!isCurrentQuery(query)) {
@@ -261,21 +201,15 @@ public class FlickrSearchActivity extends AppCompatActivity
                 viewer.onPhotosUpdated(photos);
             }
 
-            if (backgroundThumbnailFetcher != null) {
-                backgroundThumbnailFetcher.cancel();
-            }
-
-            backgroundThumbnailFetcher =
-                    new BackgroundThumbnailFetcher(FlickrSearchActivity.this, photos);
-            backgroundHandler.post(backgroundThumbnailFetcher);
-
             currentPhotos = photos;
         }
 
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         private boolean isCurrentQuery(Query query) {
             return currentQuery != null && currentQuery.equals(query);
         }
 
+        @SuppressLint("LogNotTimber")
         @Override
         public void onSearchFailed(Query query, Exception e) {
             if (!isCurrentQuery(query)) {
@@ -306,7 +240,7 @@ public class FlickrSearchActivity extends AppCompatActivity
         }
 
         @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             super.setPrimaryItem(container, position, object);
             if (position != mLastPosition) {
                 if (mLastPosition >= 0) {
@@ -329,7 +263,7 @@ public class FlickrSearchActivity extends AppCompatActivity
         @Override
         public CharSequence getPageTitle(int position) {
             Page page = Page.values()[position];
-            int titleId = PAGE_TO_TITLE.get(page);
+            @SuppressWarnings("ConstantConditions") int titleId = PAGE_TO_TITLE.get(page);
             return getString(titleId);
         }
 
@@ -342,8 +276,5 @@ public class FlickrSearchActivity extends AppCompatActivity
             }
         }
 
-        private int getPageSize(int id) {
-            return getResources().getDimensionPixelSize(id);
-        }
     }
 }
