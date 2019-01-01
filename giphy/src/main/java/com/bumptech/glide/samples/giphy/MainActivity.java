@@ -54,7 +54,7 @@ public class MainActivity extends Activity implements Api.Monitor {
     adapter = new GifAdapter(this, gifItemRequest, preloadSizeProvider);
     gifList.setAdapter(adapter);
     RecyclerViewPreloader<Api.GifResult> preloader =
-        new RecyclerViewPreloader<>(GlideApp.with(this), adapter, preloadSizeProvider, 4);
+        new RecyclerViewPreloader<>(GlideApp.with(this), adapter, preloadSizeProvider, 9);
     gifList.addOnScrollListener(preloader);
     gifList.setRecyclerListener(new RecyclerListener() {
       @Override
